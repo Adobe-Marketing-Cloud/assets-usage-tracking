@@ -1,0 +1,233 @@
+:root {
+  --color-background: #f8f8f8;
+  --color-text: #333;
+  --color-border: #ccc;
+  --color-hover: #ebebeb;
+  --color-primary: #0265DC;
+  --color-warning: orange;
+  --color-error: red;
+  --color-success: green;
+  --color-tooltip-background: #555;
+  --color-tooltip-text: white;
+  --color-lightgray: lightgray;
+  --color-white: #fff;
+  --color-gray: #5a5d60;
+  --color-blue: #0054B6;
+  --color-spinner: #09f;
+  --color-darkslategray: darkslategray;
+  --color-gray-rgba: rgba(128, 128, 128, 0.5);
+}
+
+body {
+  max-width: 81.15rem;
+  margin: auto;
+  font-family: "source-sans-3", sans-serif;
+  background-color: var(--color-background);
+}
+
+.asset-details-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 48px;
+}
+
+.asset-detail-container {
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 2px 4px var(--color-darkslategray);
+  border-radius: 8px;
+}
+
+.media-section {
+  background-color: var(--color-white);
+  padding: 15px;
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.media-section > div {
+  flex: 1;
+}
+
+.media-display img {
+  width: 600px;
+  height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.meta-data-section {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.meta-data {
+  width: 200px;
+  min-height: 64px;
+  padding: 10px;
+  flex: auto;
+}
+
+.meta-data .title {
+  font-weight: 800;
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.meta-data .value {
+  font-size: 16px;
+  padding: 10px 0;
+  color: var(--color-text);
+}
+
+.expirationDate .value.warning:before {
+  content: url("./icons/warning.svg");
+  padding-right: 5px;
+  vertical-align: middle;
+}
+
+.expirationDate .value.error:before {
+  content: url("./icons/error.svg");
+  padding-right: 5px;
+  vertical-align: middle;
+}
+
+.meta-data .tags {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 10px 0;
+}
+
+.meta-data .tags div {
+  background-color: var(--color-lightgray);
+  border-radius: 5px;
+  padding: 4px;
+  color: var(--color-gray);
+  font-size: 14px;
+}
+
+.meta-data.status.approved .value::before {
+  content: url('./icons/check.svg');
+  padding-right: 5px;
+  vertical-align: middle;
+}
+
+.usage-section {
+  margin-top: 20px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.usage-section .page {
+  padding: 10px;
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mismatched-tag {
+  padding: 0 10px;
+  background-color: var(--color-warning);
+  border-radius: 16px;
+  margin: 0 10px;
+}
+
+.usage-section .page a {
+  text-decoration: none;
+  color: var(--color-blue);
+}
+
+.usage-section .page a:hover {
+  text-decoration: underline;
+}
+
+.usage-section .page:hover {
+  background-color: var(--color-hover);
+}
+
+.back-button::before {
+  content: "<";
+  margin-right: 5px;
+}
+
+.back-button {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  border-radius: 16px;
+  padding: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  width: 50px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.copy-button::before {
+  content: url('./icons/copy.svg');
+  margin-right: 5px;
+  width: 40px;
+  display: block;
+  opacity: 0.7;
+}
+
+.copy-button {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.tooltip {
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+  z-index: 99;
+  color: var(--color-tooltip-text);
+  text-align: center;
+  background-color: var(--color-tooltip-background);
+  border-radius: 6px;
+  width: 100px;
+  padding: 3px 0;
+  margin-left: 10px;
+}
+
+.tooltip::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-tooltip-background) transparent transparent transparent;
+}
+
+
+.assets-usage {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  border-radius: 16px;
+  padding: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.usage-section .page .link .tags {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: max-content;
+  padding-top: 5px;
+}
+
+.usage-section .page .link .tags div {
+  background-color: var(--color-lightgray);
+  border-radius: 5px;
+  padding: 4px;
+  color: var(--color-gray);
+  font-size: 14px;
+}
