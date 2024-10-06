@@ -1,21 +1,12 @@
 import { PublicClientApplication } from './msal-browser-2.14.2.js';
+import excApp, { init } from '@adobe/exc-app';
+
+import { getState } from './index.js';
 
 var defaultThumbnail = require('../no-image.png');
 let accessToken;
-let connectAttempts = 0;
-(async () => {
 
-  const sp = {
-    clientApp: {
-      auth: {
-        clientId: '2b4aa217-ddcd-4fe0-b09c-5a472764f552',
-        authority: 'https://login.microsoftonline.com/fa7b1b5a-7b34-4387-94ae-d2c178decee1',
-      },
-    },
-    login: {
-      redirectUri: '/spauth.html',
-    },
-  };
+(async () => {
 
   // Create mask and spinner elements
   const mask = document.createElement('div');
@@ -34,43 +25,13 @@ let connectAttempts = 0;
   const pagePath = queryParams.get('pagePath');
   let data = {};
   async function connectAndFetchData() {
-    const publicClientApplication = new PublicClientApplication(sp.clientApp);
-    const accounts = publicClientApplication.getAllAccounts();
-
-    if (accounts.length === 0) {
-      // User is not logged in, show the login popup
-      await publicClientApplication.loginPopup(sp.login);
-
-    }
-
-    const account = publicClientApplication.getAllAccounts()[0];
-    const accessTokenRequest = {
-      scopes: ['files.readwrite', 'sites.readwrite.all'],
-      account,
-    };
 
     try {
-      const res = await publicClientApplication.acquireTokenSilent(accessTokenRequest);
-      accessToken = res.accessToken;
+      let state = await getState();
+      accessToken = state.imsToken;
+
     } catch (error) {
-      // Acquire token silent failure, and send an interactive request
-      if (error.name === 'InteractionRequiredAuthError') {
-        try {
-          const res = await publicClientApplication.acquireTokenPopup(accessTokenRequest);
-          accessToken = res.accessToken;
-          console.log(accessToken);
-        } catch (err) {
-          console.error(`Cannot connect to SharePoint: ${err.message}`);
-          document.body.removeChild(mask);
-          document.querySelector('.assets-usage-report').style.display = 'block';
-          return; // Exit if token acquisition fails
-        }
-      } else {
-        console.error('Error acquiring token silently:', error.message);
-        document.body.removeChild(mask);
-        document.querySelector('.assets-usage-report').style.display = 'block';
-        return;
-      }
+      console.log(error);
     }
 
     // Proceed if we have a valid access token

@@ -103,8 +103,7 @@ window.onload = () => {
     // fallback mode, run the application without the Experience Cloud Runtime
   }
 
-  console.log("I am in console");
-  //showActionsList()
+  showActionsList()
   document.getElementById('actionForm').onsubmit = (event) => {
     event.preventDefault()
     setTimeout(doSubmit, 1)
@@ -120,7 +119,6 @@ function initRuntime () {
   // ready event brings in authentication/user info
   runtime.on('ready', ({ imsOrg, imsToken, imsProfile, locale }) => {
     // tell the exc-runtime object we are done
-    console.log(imsToken);
     runtime.done()
     state = { imsOrg, imsToken, imsProfile, locale }
     console.log('exc-app:ready')
@@ -204,4 +202,11 @@ async function invokeAction (action, _headers, _params) {
   // action is [name, url]
   const result = await actionWebInvoke(action[1], headers, params)
   return result
+}
+
+export async function getState() {
+  while (!state.imsToken) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  return state;
 }

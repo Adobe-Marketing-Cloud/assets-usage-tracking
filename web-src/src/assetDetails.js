@@ -1,4 +1,7 @@
 const defaultThumbnail = require('../no-image.png');
+import { getState } from './index.js';
+
+let accessToken;
 (async () => {
   // eslint-disable-next-line no-undef
   const queryParams = new URLSearchParams(window.location.search);
@@ -8,6 +11,14 @@ const defaultThumbnail = require('../no-image.png');
   if (encodedJsonString) {
     const jsonString = decodeURIComponent(encodedJsonString);
     data = JSON.parse(jsonString);
+  }
+
+  try {
+    let state = await getState();
+    accessToken = state.imsToken;
+
+  } catch (error) {
+    console.log(error);
   }
   init(data);
 
@@ -114,7 +125,13 @@ const defaultThumbnail = require('../no-image.png');
         });
         pageDiv.appendChild(viewDetail);
         pagesSection.appendChild(pageDiv);
-        fetch(`https://288650-edsassettracker-stage.adobeio-static.net/api/v1/web/EDS-Asset-Tracker1/fetchList?hlxUrl=${hlxUrl}`)
+        fetch(`https://288650-edsassettracker-stage.adobeio-static.net/api/v1/web/EDS-Asset-Tracker1/fetchList?hlxUrl=${hlxUrl}`, {
+            method: 'GET', // or 'POST' if you want to send data
+            headers: {
+              'Authorization': `Bearer ${accessToken}`, // Send the access token in the Authorization header
+              'Content-Type': 'application/json' // Specify the content type as JSON
+              }
+            })
             .then(response => response.json())
             .then(data => {
               console.log(data.payload.pageDetails[page].tags);
