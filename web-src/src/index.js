@@ -205,7 +205,10 @@ async function invokeAction (action, _headers, _params) {
 }
 
 export async function getState() {
+  let attempts = 0;
   while (!state.imsToken) {
+    attempts++;
+    console.log(`Attempt number: ${attempts}`);
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   return state;

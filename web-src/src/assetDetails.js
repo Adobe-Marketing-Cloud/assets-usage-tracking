@@ -6,20 +6,22 @@ let accessToken;
   // eslint-disable-next-line no-undef
   const queryParams = new URLSearchParams(window.location.search);
   const encodedJsonString = queryParams.get('data');
-  const hlxUrl= queryParams.get('hlxUrl');
-  let data = {};
-  if (encodedJsonString) {
-    const jsonString = decodeURIComponent(encodedJsonString);
-    data = JSON.parse(jsonString);
-  }
+  const hlxUrl= sessionStorage.getItem('hlxUrl');
+  const urn= queryParams.get('urn');
+  // console.log(sessionStorage.getItem('assetDetails'));
+  const data1 = JSON.parse(sessionStorage.getItem('assetDetails'));
 
-  try {
-    let state = await getState();
-    accessToken = state.imsToken;
+  let data = data1[urn];
+  // if (encodedJsonString) {
+  //   const jsonString = decodeURIComponent(encodedJsonString);
+  //   data = JSON.parse(jsonString);
+  // }
 
-  } catch (error) {
-    console.log(error);
+  async function connectAndFetchData() {
+    accessToken = sessionStorage.getItem('accessToken');
+    // Proceed if we have a valid access token
   }
+  await connectAndFetchData();
   init(data);
 
   function init(data) {
@@ -121,11 +123,11 @@ let accessToken;
         viewDetail.classList.add('assets-usage');
         viewDetail.textContent = "Assets Usage Report";
         viewDetail.addEventListener('click', () => {
-          window.location.href = `/assetsUsageReport.html?hlxUrl=${hlxUrl}&pagePath=${page}`;
+          window.location.href = `/assetsUsageReport.html?pagePath=${page}`;
         });
         pageDiv.appendChild(viewDetail);
         pagesSection.appendChild(pageDiv);
-        fetch(`https://288650-edsassettracker-stage.adobeio-static.net/api/v1/web/EDS-Asset-Tracker1/fetchList?hlxUrl=${hlxUrl}`, {
+        fetch(`https://288650-edsassettracker.adobeio-static.net/api/v1/web/EDS-Asset-Tracker1/fetchList?hlxUrl=${hlxUrl}`, {
             method: 'GET', // or 'POST' if you want to send data
             headers: {
               'Authorization': `Bearer ${accessToken}`, // Send the access token in the Authorization header

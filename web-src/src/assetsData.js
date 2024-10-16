@@ -21,21 +21,32 @@ let accessToken;
   document.body.appendChild(mask);
 
   const queryParams = new URLSearchParams(window.location.search);
-  const hlxUrl = queryParams.get('hlxUrl');
   const pagePath = queryParams.get('pagePath');
+  let hlxUrl;
+  if (pagePath) {
+    hlxUrl = sessionStorage.getItem('hlxUrl');
+  } else {
+    hlxUrl = queryParams.get('hlxUrl');
+    sessionStorage.setItem('hlxUrl', hlxUrl);
+  }
+
   let data = {};
   async function connectAndFetchData() {
+    accessToken = sessionStorage.getItem('accessToken');
+    if (!accessToken) {
+      try {
+        let state = await getState();
+        accessToken = state.imsToken;
 
-    try {
-      let state = await getState();
-      accessToken = state.imsToken;
-
-    } catch (error) {
-      console.log(error);
+      } catch (error) {
+        console.log(error);
+      }
     }
+
 
     // Proceed if we have a valid access token
     if (accessToken) {
+      sessionStorage.setItem('accessToken', accessToken);
       try {
         const response = await fetch(
             `https://288650-edsassettracker.adobeio-static.net/api/v1/web/EDS-Asset-Tracker1/fetchList?hlxUrl=${hlxUrl}`,
@@ -113,6 +124,7 @@ let accessToken;
       pageFilter.appendChild(parentDiv);
     }
 
+    sessionStorage.setItem('assetDetails', JSON.stringify(response.payload.assetDetails));
     Object.entries(response.payload.assetDetails).forEach(([urn, asset]) => {
       const assetRow = document.createElement('div');
       assetRow.className = 'asset-row';
@@ -202,10 +214,10 @@ let accessToken;
       const jsonString = JSON.stringify(asset);
       const encodedJsonString = encodeURIComponent(jsonString);
       // Use URN in the query string to identify the asset in the details page
-      detailLink.href = `/assetDetails.html?data=${encodedJsonString}&hlxUrl=${hlxUrl}`;
+      detailLink.href = `/assetDetails.html?urn=${urn}`;
       if (asset.pagePath.length > topUsage) {
         topUsage = asset.pagePath.length;
-        topUsed = `/assetDetails.html?data=${encodedJsonString}&hlxUrl=${hlxUrl}`;
+        topUsed = `/assetDetails.html?urn=${urn}`;
       }
       detailLinkDiv.appendChild(detailLink);
       assetRow.appendChild(detailLinkDiv);
@@ -254,7 +266,7 @@ let accessToken;
         const jsonString = JSON.stringify(asset);
         const encodedJsonString = encodeURIComponent(jsonString);
         // Use URN in the query string to identify the asset in the details page
-        const href = `/assetDetails.html?data=${encodedJsonString}&hlxUrl=${hlxUrl}`;
+        const href = `/assetDetails.html?urn=${urn}`;
         const cleanThumbnailUrl = new URL(asset.assetPath);
         let thumbnail;
         if (!asset.isExpired)
