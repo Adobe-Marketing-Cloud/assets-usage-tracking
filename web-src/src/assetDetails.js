@@ -123,7 +123,7 @@ let accessToken;
         viewDetail.classList.add('assets-usage');
         viewDetail.textContent = "Assets Usage Report";
         viewDetail.addEventListener('click', () => {
-          window.location.href = `/assetsUsageReport.html?pagePath=${page}`;
+          window.location.href = `/index.html?pagePath=${page}`;
         });
         pageDiv.appendChild(viewDetail);
         pagesSection.appendChild(pageDiv);

@@ -101,7 +101,7 @@ let accessToken;
       allAssetsDiv.classList.add('all-asset-usage-report');
       allAssetsDiv.textContent = '< Back to site assets usage report';
       allAssetsDiv.addEventListener('click', () => {
-        window.location.href = `/assetsUsageReport.html?hlxUrl=${hlxUrl}`;
+        window.location.href = `/index.html?hlxUrl=${hlxUrl}`;
       });
       const pageFilter = document.querySelector('.page-filter');
       pageFilter.classList.remove('all');

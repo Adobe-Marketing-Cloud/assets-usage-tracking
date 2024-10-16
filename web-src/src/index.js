@@ -205,6 +205,7 @@ async function invokeAction (action, _headers, _params) {
 }
 
 export async function getState() {
+  console.log('Getting state');
   let attempts = 0;
   while (!state.imsToken) {
     attempts++;
