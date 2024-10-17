@@ -6,6 +6,8 @@ import regeneratorRuntime from 'regenerator-runtime'
 import Runtime, { init } from '@adobe/exc-app'
 import actions from './config.json'
 import actionWebInvoke from './utils.js'
+import assetsDataInit from "./assetsData.js";
+import { PublicClientApplication } from './msal-browser-2.14.2.js';
 
 let state = {}
 
@@ -91,22 +93,102 @@ let state = {}
 
 
 
-window.onload = () => {
+window.onload = async () => {
   /* Here you can bootstrap your application and configure the integration with the Adobe Experience Cloud Shell */
   try {
     // attempt to load the Experience Cloud Runtime
     require('./exc-runtime')
     // if there are no errors, bootstrap the app in the Experience Cloud Shell
     init(initRuntime)
+
+    let state1 = await getState();
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const hlxUrl = queryParams.get('hlxUrl');
+    sessionStorage.setItem('hlxUrl', hlxUrl);
+    sessionStorage.setItem('accessToken', state1.imsToken);
+    await assetsDataInit();
   } catch (e) {
     console.log('application not running in Adobe Experience Cloud Shell')
     // fallback mode, run the application without the Experience Cloud Runtime
+    let accessToken = sessionStorage.getItem('accessToken');
+    if (!accessToken) {
+      accessToken = await fetchAccessToken();
+      console.log(accessToken);
+      sessionStorage.setItem('accessToken', accessToken);
+    } else {
+      console.log('Access token found in session storage');
+      console.log(accessToken);
+
+    }
+    // console.log(accessToken);
+    // state1.imsToken = accessToken;
+    let hlxUrl = sessionStorage.getItem('hlxUrl');
+    if (!hlxUrl) {
+        const queryParams = new URLSearchParams(window.location.search);
+        hlxUrl = queryParams.get('hlxUrl');
+        sessionStorage.setItem('hlxUrl', hlxUrl);
+    }
+    await assetsDataInit();
   }
 
-  showActionsList()
-  document.getElementById('actionForm').onsubmit = (event) => {
-    event.preventDefault()
-    setTimeout(doSubmit, 1)
+   // await assetsDataInit(state);
+
+}
+
+async function fetchAccessToken () {
+  const sp = {
+    clientApp: {
+      auth: {
+        clientId: '2b4aa217-ddcd-4fe0-b09c-5a472764f552',
+        authority: 'https://login.microsoftonline.com/fa7b1b5a-7b34-4387-94ae-d2c178decee1',
+      },
+    },
+    login: {
+      redirectUri: '/spauth.html',
+    },
+  };
+
+  let accessToken;
+  const publicClientApplication = new PublicClientApplication(sp.clientApp);
+  const accounts = publicClientApplication.getAllAccounts();
+
+  if (accounts.length === 0) {
+    // User is not logged in, show the login popup
+    await publicClientApplication.loginPopup(sp.login);
+
+  }
+
+  const account = publicClientApplication.getAllAccounts()[0];
+  const accessTokenRequest = {
+    scopes: ['files.readwrite', 'sites.readwrite.all'],
+    account,
+  };
+
+  try {
+    const res = await publicClientApplication.acquireTokenSilent(accessTokenRequest);
+    accessToken = res.accessToken;
+    return accessToken;
+  } catch (error) {
+    // Acquire token silent failure, and send an interactive request
+    if (error.name === 'InteractionRequiredAuthError') {
+      try {
+        const res = await publicClientApplication.acquireTokenPopup(accessTokenRequest);
+        accessToken = res.accessToken;
+        console.log(accessToken);
+        return accessToken;
+      } catch (err) {
+        console.error(`Cannot connect to SharePoint: ${err.message}`);
+        document.body.removeChild(mask);
+        document.querySelector('.assets-usage-report').style.display = 'block';
+        return null; // Exit if token acquisition fails
+      }
+    } else {
+      console.error('Error acquiring token silently:', error.message);
+      document.body.removeChild(mask);
+      document.querySelector('.assets-usage-report').style.display = 'block';
+      return null;
+    }
   }
 }
 
@@ -203,8 +285,7 @@ async function invokeAction (action, _headers, _params) {
   const result = await actionWebInvoke(action[1], headers, params)
   return result
 }
-
-export async function getState() {
+async function getState() {
   console.log('Getting state');
   let attempts = 0;
   while (!state.imsToken) {

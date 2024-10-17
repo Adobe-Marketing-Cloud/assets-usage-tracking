@@ -1,13 +1,14 @@
 import { PublicClientApplication } from './msal-browser-2.14.2.js';
 import excApp, { init } from '@adobe/exc-app';
 
-import { getState } from './index.js';
+// import { getState } from './index.js';
 
 var defaultThumbnail = require('../no-image.png');
 let accessToken;
 
-(async () => {
+async function assetsDataInit() {
 
+  console.log('I am here3 ');
   // Create mask and spinner elements
   const mask = document.createElement('div');
   mask.className = 'mask';
@@ -22,21 +23,21 @@ let accessToken;
 
   const queryParams = new URLSearchParams(window.location.search);
   const pagePath = queryParams.get('pagePath');
-  let hlxUrl;
-  if (pagePath) {
-    hlxUrl = sessionStorage.getItem('hlxUrl');
-  } else {
-    hlxUrl = queryParams.get('hlxUrl');
-    sessionStorage.setItem('hlxUrl', hlxUrl);
-  }
+  const hlxUrl = sessionStorage.getItem('hlxUrl');
+  // if (pagePath) {
+  //   hlxUrl = sessionStorage.getItem('hlxUrl');
+  // } else {
+  //   hlxUrl = queryParams.get('hlxUrl');
+  //   sessionStorage.setItem('hlxUrl', hlxUrl);
+  // }
 
   let data = {};
   async function connectAndFetchData() {
     accessToken = sessionStorage.getItem('accessToken');
     if (!accessToken) {
       try {
-        let state = await getState();
-        accessToken = state.imsToken;
+        // let state = await getState();
+        // accessToken = state.imsToken;
 
       } catch (error) {
         console.log(error);
@@ -46,7 +47,7 @@ let accessToken;
 
     // Proceed if we have a valid access token
     if (accessToken) {
-      sessionStorage.setItem('accessToken', accessToken);
+      // sessionStorage.setItem('accessToken', accessToken);
       try {
         const response = await fetch(
             `https://288650-edsassettracker.adobeio-static.net/api/v1/web/EDS-Asset-Tracker1/fetchList?hlxUrl=${hlxUrl}`,
@@ -360,4 +361,6 @@ let accessToken;
 
   }
 
-})();
+}
+
+export default assetsDataInit;
